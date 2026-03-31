@@ -3,8 +3,10 @@
 import { useState, useMemo, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { generatePackages } from '@/lib/data'
+import { SelectionProvider, useSelection } from '@/lib/selection'
 import Header from './components/Header'
 import CargoTrackingPanel from './components/CargoTrackingPanel'
+import DetailPanel from './components/DetailPanel'
 
 const WarehouseScene = dynamic(() => import('./components/WarehouseScene'), { ssr: false })
 
@@ -19,7 +21,13 @@ function LoadingScreen() {
   )
 }
 
-export default function Home() {
+function SelectionPanel() {
+  const { selected, setSelected } = useSelection()
+  if (!selected) return null
+  return <DetailPanel selected={selected} onClose={() => setSelected(null)} />
+}
+
+function HomeContent() {
   const [activeWarehouse, setActiveWarehouse] = useState('warehouse-1')
   const [isTrackingOpen, setIsTrackingOpen] = useState(false)
 
@@ -44,9 +52,12 @@ export default function Home() {
       <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-ana-soft-gray">
         <p className="text-xs text-ana-dark/80">
           <span className="font-semibold text-ana-blue">Controls:</span>{' '}
-          Drag to rotate • Scroll to zoom • Right-click to pan
+          Drag to rotate • Scroll to zoom • Right-click to pan • Click objects for details
         </p>
       </div>
+
+      {/* Selection Detail Panel */}
+      <SelectionPanel />
 
       {/* Cargo Tracking Panel */}
       <CargoTrackingPanel
@@ -55,5 +66,13 @@ export default function Home() {
         packages={packages}
       />
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <SelectionProvider>
+      <HomeContent />
+    </SelectionProvider>
   )
 }
