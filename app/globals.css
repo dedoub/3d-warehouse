@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ana-blue: #0072CE;
+  --color-ana-dark: #00467F;
+  --color-ana-light-blue: #4DA6FF;
+  --color-ana-sky: #E8F4FD;
+  --color-ana-soft-gray: #E5E7EB;
+}
