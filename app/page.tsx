@@ -4,9 +4,11 @@ import { useState, useMemo, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { generatePackages } from '@/lib/data'
 import { SelectionProvider, useSelection } from '@/lib/selection'
+import { WarehouseConfig, DEFAULT_CONFIG } from '@/lib/config'
 import Header from './components/Header'
 import CargoTrackingPanel from './components/CargoTrackingPanel'
 import DetailPanel from './components/DetailPanel'
+import SceneEditor from './components/SceneEditor'
 
 const WarehouseScene = dynamic(() => import('./components/WarehouseScene'), { ssr: false })
 
@@ -30,8 +32,9 @@ function SelectionPanel() {
 function HomeContent() {
   const [activeWarehouse, setActiveWarehouse] = useState('warehouse-1')
   const [isTrackingOpen, setIsTrackingOpen] = useState(false)
+  const [config, setConfig] = useState<WarehouseConfig>(DEFAULT_CONFIG)
 
-  const packages = useMemo(() => generatePackages(30), [])
+  const packages = useMemo(() => generatePackages(config.packageCount), [config.packageCount])
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -44,9 +47,12 @@ function HomeContent() {
       {/* 3D Canvas */}
       <div className="absolute inset-0">
         <Suspense fallback={<LoadingScreen />}>
-          <WarehouseScene packages={packages} activeWarehouse={activeWarehouse} />
+          <WarehouseScene packages={packages} activeWarehouse={activeWarehouse} config={config} />
         </Suspense>
       </div>
+
+      {/* Scene Editor */}
+      <SceneEditor config={config} onChange={setConfig} />
 
       {/* Controls hint */}
       <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-ana-soft-gray">
